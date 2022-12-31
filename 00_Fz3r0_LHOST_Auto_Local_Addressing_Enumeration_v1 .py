@@ -6,7 +6,7 @@
 #      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@                                                                                  #
 #     @@@@@@@@@@@@@@@/      \@@@/   @         Version:........ 1.0                                                    #
 #    @@@@@@@@@@@@@@@@\      @@  @___@                                                                                 #
-#    @@@@@@@@@@@@@ @@@@@@@@@@  | \@@@@@       Github:......... github.com/Fz3r0                                       #  
+#    @@@@@@@@@@@@@ @@@@@@@@@@  | \@@@@@       Github:......... github.com/Fz3r0                                       #
 #    @@@@@@@@@@@@@ @@@@@@@@@\__@_/@@@@@                                                                               #
 #     @@@@@@@@@@@@@@@/,/,/./'/_|.\'\,\        Twitter:........ @Fz3r0_OPs                                             #
 #       @@@@@@@@@@@@@|  | | | | | | | |                                                                               #
@@ -14,17 +14,26 @@
 #                                                                                                                     #
 #    DESCRIPCIÓN:                                                                                                     #
 #                                                                                                                     #
-#    - Esta herramienta obtiene automaticamente la IPv4 del LHOST (Local Host o la Máquina Local), default "eth0"     # 
-#    - También permite obtener automaticamente la IPv4 del túnel VPN del LHOST, default "tun0"                        #
+#    - Esta herramienta obtiene automaticamente la IPv4 del LHOST (Local Host o la Máquina Local)                     #
+#    - También permite obtener automaticamente la IPv4 del túnel VPN del LHOST                                        #
 #    - De la misma manera obtiene la MAC Address del LHOST (la MAC local y real del host)                             #
 #    - Al finalizar la función permite guardar las variables por separado para facilitar y eficientar su uso          #
-#    - También permite modificar la búsqueda de interfaces locales de manera manual (en caso de usar otra interfaz)   #
-#                                                                                                                     # 
+#    - La idea es que sea utilizado como módulo para proyectos más grandes de Network Security y Pentesting           #
+#                                                                                                                     #
+#    INSTRUCCIONES:                                                                                                   #
+#                                                                                                                     #
+#    - Solo basta escribir el siguiente comando para que el script detecte tanto las interfaces activas como          #
+#      su direccionamiento IPv4 y MAC, incluyendo interfaces locales y túnel VPN.                                     #
+#                                                                                                                     #
+#          python 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1.py                                              #
+#                                                                                                                     #
+#    USAR COMO MÓDULO ADICIONAL DESDE OTRO SCRIPT PYTHON:                                                             #
+#                                                                                                                     #
+#    - Nota: El archivo ".py" se debe poner en misma carpeta, dentro de ese script importar como cualquier módulo:    #
+#                                                                                                                     #
+#         import 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1                                                  #
+#                                                                                                                     #
 #######################################################################################################################
-
-# Ejemplo para importar este script dentro de otro de manera completa (se debe poner en misma carpeta):
-
-    # import 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1 
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 #
@@ -32,92 +41,118 @@
 #
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
-# VARIABLES MODIFICABLES (DEFAULTS)
-
-    # 1. Interfaz Default Física = eth0 [normalmente eth0 es la default en Linux]
-    # 2. Interfaz Default Tunel  = tun0 [normalmente tun0 es la default en Linux]
-
-        # En caso de querer localizar por default el direccionamiento de otra interfaz local manualmente por default modificar
-
-lhost_interface_eth_funct_x = "eth0"     # <<<--- Interfaz "Física" - LHOST
-lhost_interface_tun_funct_x = "tun0"     # <<<--- Túnel para VPN - LHOST 
-
-# FLAGS PARA COMANDO 
-
-    # Estas flags modificarán la variable de las interfaces eth0 y tun0, en caso de no modificar la flag se tomarán los default
-
-        # -i   --interface        = modificará manualmente la variable default "eth0" (FÍSICA) para utilizar una interfaz diferente
-
-        # -it  --interface_tunel  = modificará manualmente la variable default "tun0" (TÚNEL/VPN) para utilizar una interfaz diferente
-
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
 # MÓDULOS NECESARIOS 
 
 # scapy: Packet Forgey
 import scapy.all as scapy
-# argparse: Generador de Argumentos
-import argparse
+# psutil: Obtiene información del Sistema (utilizada para buscar interfaz activa)
+import psutil
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
-# FUNCIÓN PRINCIPAL - OBTENER INFORMACIÓN DE LA INTERFAZ DE LHOST
+# SECCIONES PRINCIPALES: A y B
 
-def obtener_info_interfaz(interface=lhost_interface_eth_funct_x , interface_tunel=lhost_interface_tun_funct_x):
+    # 1. SECCIÓN A - OBTENER STATUS DE INTERFACES ETHERNET Y TUNEL VPN ACTIVAS DE LHOST 
+    #
+    #    - Esta secćón permite obtener de manera automática las interfaces de red activas en el LHOST
+    #    - Al obtener una IPv4 la detectará activa y será la interfaz que se utilizará en la siguiente función
+    #    - La función permite obtener tanto la IP de Ethernet local como la IP de túnel VPN en caso de existir
+
+# Obtenemos la información de las interfaces de red
+interfaces_informacion_lhost = psutil.net_if_addrs()
+
+# Inicializamos las variables que almacenarán las interfaces activas
+f0_eth_interface_lhost = "eth_no_disponible_lhost"
+f0_tun_interface_lhost = "tun_no_disponible_lhost"
+
+# Recorremos las interfaces
+for interfaz, direcciones in interfaces_informacion_lhost.items():
+    # Si la interfaz es una interfaz ethernet y tiene al menos una dirección IP válida,
+    # la guardamos como la interfaz local activa
+    if "eth" in interfaz and any(addr.address != "0.0.0.0" and addr.address != "127.0.0.1" for addr in direcciones):
+        f0_eth_interface_lhost = interfaz
+        break
+
+# Recorremos de nuevo las interfaces
+for interfaz, direcciones in interfaces_informacion_lhost.items():
+    # Si la interfaz es una interfaz de túnel VPN y tiene al menos una dirección IP válida,
+    # la guardamos como la interfaz de túnel activa
+    if "tun" in interfaz and any(addr.address != "0.0.0.0" and addr.address != "127.0.0.1" for addr in direcciones):
+        f0_tun_interface_lhost = interfaz
+        break
+
+    # 2. SECCIÓN B - FUNCIÓN PARA UTILIZAR EL STATUS OBTENIDO EN "1." PARA OBTENER EL DIRECCIONAMIENTO IP Y MAC TANTO DE ETH COMO TUNEL
+    #
+    # - Esta función permite obtener de manera automática la Interfaz de red activa en el LHOST
+    # - Al obtener una IPv4 la detectará activa y será la interfaz que se utilizará en la siguiente función
+
+def obtener_info_interfaz(f0_eth_interface_lhost , f0_tun_interface_lhost):
   # Obtener la dirección IP de la interfaz especificada
   try:
-    ip_local_lhost = scapy.get_if_addr(interface)
+    f0_ip_local_lhost = scapy.get_if_addr(f0_eth_interface_lhost)
   except Exception:
-    ip_local_lhost = "No se pudo obtener la dirección IPv4 de la interfaz: {}".format(interface)
+    f0_ip_local_lhost = "No se pudo obtener la dirección IPv4 de la interfaz: {}".format(f0_eth_interface_lhost)
   
   # Obtener la dirección IP de la interfaz de túnel (por ejemplo VPN) especificada
   try:
-    ip_tunel_lhost = scapy.get_if_addr(interface_tunel)
+    f0_ip_tunel_lhost = scapy.get_if_addr(f0_tun_interface_lhost)
   except Exception:
-    ip_tunel_lhost = "No se pudo obtener la dirección IPv4 de la interfaz: {}".format(interface_tunel)
+    f0_ip_tunel_lhost = "No se pudo obtener la dirección IPv4 de la interfaz: {}".format(f0_tun_interface_lhost)
   
   # Obtener la dirección MAC de la interfaz especificada
   try:
-    mac_local_lhost = scapy.get_if_hwaddr(interface)
+    f0_mac_local_lhost = scapy.get_if_hwaddr(f0_eth_interface_lhost)
   except Exception:
-    mac_local_lhost = "No se pudo obtener la dirección MAC de la interfaz: {}".format(interface)
+    f0_mac_local_lhost = "No se pudo obtener la dirección MAC de la interfaz: {}".format(f0_eth_interface_lhost)
   
   # Obtener los valores obtenidos durante la función para ser guardados en memoria, así se pueden usar libremente
-  return (ip_local_lhost, ip_tunel_lhost, mac_local_lhost)
+  return (f0_ip_local_lhost, f0_ip_tunel_lhost, f0_mac_local_lhost)
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
-# DECLARACIÓN DE ARGUMENTOS Y FLAGS (VARIABLES DE COMANDO)
+# OBTENER RESULTADOS DE DIRECCIONAMIENTO FUERA DE LA FUNCIÓN:
 
-if __name__ == "__main__":
-  # Crear un parser de argumentos para permitir al usuario especificar las interfaces
-  parser = argparse.ArgumentParser()
-  parser.add_argument("-i", "--interface", help="Nombre de la interfaz local a consultar, ej. eth0", default=lhost_interface_eth_funct_x)
-  parser.add_argument("-it", "--interface_tunel", help="Nombre de la interfaz local de túnel/VPN a consultar, ej. tun0", default=lhost_interface_tun_funct_x)
-  args = parser.parse_args()
-
-  # Obtener la información de las interfaces especificadas
-  (ip_local_lhost, ip_tunel_lhost, mac_local_lhost) = obtener_info_interfaz(args.interface, args.interface_tunel)
+# Asigna a las 3 variables mostradas, el resultado de las 3 variables obtenidas por la función
+# Por fines prácticos tienen los mismos nombres, pero en realidad se podrían usar 3 variables nuevas para recibir esos datos de la funcón:
+(f0_ip_local_lhost, f0_ip_tunel_lhost, f0_mac_local_lhost) = obtener_info_interfaz(f0_eth_interface_lhost, f0_tun_interface_lhost)
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
-# FUERA DE LA FUNCIÓN ASÍ SE OBTIENEN LOS DATOS:
+# RESULTADOS: VARIABLES EN MEMORIA 
 
-    # Ahora ya se pueden utilizar esas 3 sencillas variables para llamar en cualquier lugar el direccionamiento local :D 
+    # - Ahora ya se pueden utilizar los valores se las 5 variables totales obtenidas de manera automática.
+    # - En este ejemplo se imprimen los resultados en consola, pero pueden ser guardados para mandarlos llamar a conveniencia
 
-        # Nota: Estas lineas pueden ser comentadas o borradas en caso de utilizar la función en otro script
+# Imprimimos la información de las interfaces activas
+print()
+if f0_eth_interface_lhost != "eth_no_disponible_lhost":
+    print("[🔴] Interfaz ethernet local activa:...<( {} )>".format(f0_eth_interface_lhost))
+else:
+    print("Interfaz ethernet local no disponible")
+
+if f0_tun_interface_lhost != "tun_no_disponible_lhost":
+    print("[🔵] Interfaz de túnel VPN activa:.....<( {} )>".format(f0_tun_interface_lhost))
+else:
+    print("Interfaz de túnel VPN no disponible")
 
 # Ejemplo para imprimir la información obtenida con lineas combinadas:
 print()
-print("[🔴] Dirección IP de  {}:....... {}".format(args.interface, ip_local_lhost))
-print("[🔵] Dirección IP de  {}:....... {}".format(args.interface_tunel, ip_tunel_lhost))
-print("[🟢] Dirección MAC de {}:....... {}".format(args.interface, mac_local_lhost))
+print("[🔴] Dirección IP de <( {} )>:.......<( {} )>".format(f0_eth_interface_lhost, f0_ip_local_lhost))
+print("[🔵] Dirección IP de <( {} )>:.......<( {} )>".format(f0_tun_interface_lhost, f0_ip_tunel_lhost))
+print("[🟢] Dirección MAC:....................<( {} )>".format(f0_mac_local_lhost))
 
 # Ejemplo para imprimir la información obtenida de manera sencilla:
 print()
-print(ip_local_lhost)
-print(ip_tunel_lhost)
-print(mac_local_lhost)
+print("--->>>")
+print()
+print(f0_eth_interface_lhost)
+print(f0_tun_interface_lhost)
+print()
+print(f0_ip_local_lhost)
+print(f0_ip_tunel_lhost)
+print(f0_mac_local_lhost)
 
 # Promoción desvergonzada del padrino: 
 print()
