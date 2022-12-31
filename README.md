@@ -1,4 +1,4 @@
-# Fz3r0: LHOST Auto Local Addressing Enumeration
+# Fz3r0 - LHOST Auto Local Addressing Enumeration
 Obtiene y guarda automaticamente la IPv4 y MAC de LHOST incluyendo interfaz física y túnel VPN
 
 ## Descripción
