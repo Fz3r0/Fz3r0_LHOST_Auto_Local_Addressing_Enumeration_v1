@@ -1,5 +1,6 @@
 # Fz3r0 - LHOST Auto Local Addressing Enumeration
-Obtiene y guarda automaticamente la IPv4 y MAC de LHOST incluyendo interfaz física y túnel VPN
+
+_Keywords:_ `Python` `Scapy` `Host Enumeration` `Network Automation` `IP & MAC Addressing` `Networking` `Pentesting`
 
 ## Script
 
@@ -7,6 +8,7 @@ Obtiene y guarda automaticamente la IPv4 y MAC de LHOST incluyendo interfaz fís
 
 ## Descripción
 
+- Obtiene y guarda automaticamente la IPv4 y MAC de LHOST incluyendo interfaz física y túnel VPN
 - Esta herramienta obtiene automaticamente la IPv4 del LHOST (Local Host o la Máquina Local), default "eth0"     
 - También permite obtener automaticamente la IPv4 del túnel VPN del LHOST, default "tun0"                        
 - De la misma manera obtiene la MAC Address del LHOST (la MAC local y real del host)                             
