@@ -25,18 +25,11 @@ import 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1
 
 ## Modo de uso
 
-- Comando por default:
+- Ejecutar el siguiente comando en Bash:
 
 ```py
 python 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1.py
 ```
-![image](https://user-images.githubusercontent.com/94720207/210150678-879c15bc-1389-4151-8a07-345790cfd70a.png)
+![image](https://user-images.githubusercontent.com/94720207/210156099-162f3d9d-dcb8-4cbc-820e-8769fa688c4f.png)
 
-## Flags y Argumentos
-
-## Modificación de variables Default
-
-- 
-
-![image](https://user-images.githubusercontent.com/94720207/210150866-36680b1d-d29d-48ff-9d7e-c2baed9d7f62.png)
 
