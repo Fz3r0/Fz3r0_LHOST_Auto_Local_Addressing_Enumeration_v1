@@ -64,8 +64,8 @@ import psutil
 interfaces_informacion_lhost = psutil.net_if_addrs()
 
 # Inicializamos las variables que almacenarán las interfaces activas
-f0_eth_interface_lhost = "eth_no_disponible_lhost"
-f0_tun_interface_lhost = "tun_no_disponible_lhost"
+f0_eth_interface_lhost = "N/A "
+f0_tun_interface_lhost = "N/A "
 
 # Recorremos las interfaces
 for interfaz, direcciones in interfaces_informacion_lhost.items():
@@ -127,25 +127,25 @@ def obtener_info_interfaz(f0_eth_interface_lhost , f0_tun_interface_lhost):
 
 # Imprimimos la información de las interfaces activas
 print()
-if f0_eth_interface_lhost != "eth_no_disponible_lhost":
-    print("[🔴] Interfaz ethernet local activa:...<( {} )>".format(f0_eth_interface_lhost))
+if f0_eth_interface_lhost != "N/A ":
+    print("[🟢] Interfaz ethernet local activa:...<( {} )>".format(f0_eth_interface_lhost))
 else:
-    print("Interfaz ethernet local no disponible")
+    print("[🔴] IInterfaz ethernet local no disponible")
 
-if f0_tun_interface_lhost != "tun_no_disponible_lhost":
-    print("[🔵] Interfaz de túnel VPN activa:.....<( {} )>".format(f0_tun_interface_lhost))
+if f0_tun_interface_lhost != "N/A ":
+    print("[🟢] Interfaz de túnel VPN activa:.....<( {} )>".format(f0_tun_interface_lhost))
 else:
-    print("Interfaz de túnel VPN no disponible")
+    print("[🔴] Interfaz de túnel VPN no disponible")
 
 # Ejemplo para imprimir la información obtenida con lineas combinadas:
 print()
-print("[🔴] Dirección IP de <( {} )>:.......<( {} )>".format(f0_eth_interface_lhost, f0_ip_local_lhost))
-print("[🔵] Dirección IP de <( {} )>:.......<( {} )>".format(f0_tun_interface_lhost, f0_ip_tunel_lhost))
-print("[🟢] Dirección MAC:....................<( {} )>".format(f0_mac_local_lhost))
+print("[🔵] Dirección IP de <( {} )>:.......<( {} )>".format(f0_eth_interface_lhost, f0_ip_local_lhost))
+print("[🟣] Dirección IP de <( {} )>:.......<( {} )>".format(f0_tun_interface_lhost, f0_ip_tunel_lhost))
+print("[🔵] Dirección MAC:....................<( {} )>".format(f0_mac_local_lhost))
 
-# Ejemplo para imprimir la información obtenida de manera sencilla:
+# Ejemplo para imprimir únicamente los valores obtenidos de las variables:
 print()
-print("--->>>")
+print(" >> Variables guardadas en memoria:")
 print()
 print(f0_eth_interface_lhost)
 print(f0_tun_interface_lhost)
