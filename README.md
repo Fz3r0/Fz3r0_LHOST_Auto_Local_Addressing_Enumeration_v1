@@ -12,3 +12,14 @@ Obtiene y guarda automaticamente la IPv4 y MAC de LHOST incluyendo interfaz fís
 ## Objetivo
 
 - Esta herramienta está pensada como parte de los nuevos módulos que estoy programando para mi proyecto de Arsenal de Networking
+
+## Instalación
+
+- Solo es necesario copiar el archivo `.py` al directorio de trabajo
+- En caso de querer utilizar como módulo adicional de otro script utilizar al inicio:
+
+```py
+import 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1
+```
+
+## Modo de uso
