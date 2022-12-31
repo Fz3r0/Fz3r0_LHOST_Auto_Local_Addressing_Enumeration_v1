@@ -32,4 +32,10 @@ python 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1.py
 ```
 ![image](https://user-images.githubusercontent.com/94720207/210156099-162f3d9d-dcb8-4cbc-820e-8769fa688c4f.png)
 
+## Variables obtenidas
+
+- Esta herramienta funionca excelente como módilo adicional para generar las siguientes 5 variables automáticamente de manera sencilla
+
+![image](https://user-images.githubusercontent.com/94720207/210156178-f085f63f-5b41-46ba-85e4-05a5074a8343.png)
+
 
