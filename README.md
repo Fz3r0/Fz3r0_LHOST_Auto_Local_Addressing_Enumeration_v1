@@ -1,6 +1,10 @@
 # Fz3r0 - LHOST Auto Local Addressing Enumeration
 Obtiene y guarda automaticamente la IPv4 y MAC de LHOST incluyendo interfaz física y túnel VPN
 
+## Script
+
+- [Descargar/Download Script](https://github.com/Fz3r0/Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1/blob/main/00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1%20.py)
+
 ## Descripción
 
 - Esta herramienta obtiene automaticamente la IPv4 del LHOST (Local Host o la Máquina Local), default "eth0"     
