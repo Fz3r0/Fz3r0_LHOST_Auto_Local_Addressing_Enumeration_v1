@@ -22,4 +22,12 @@ Obtiene y guarda automaticamente la IPv4 y MAC de LHOST incluyendo interfaz fís
 import 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1
 ```
 
+
 ## Modo de uso
+
+- Comando por default:
+
+```py
+python 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1.py
+```
+![image](https://user-images.githubusercontent.com/94720207/210150678-879c15bc-1389-4151-8a07-345790cfd70a.png)
