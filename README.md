@@ -30,12 +30,16 @@ import 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1
 ```py
 python 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1.py
 ```
-![image](https://user-images.githubusercontent.com/94720207/210156099-162f3d9d-dcb8-4cbc-820e-8769fa688c4f.png)
+![image](https://user-images.githubusercontent.com/94720207/210156559-e3840b9f-4fd4-43f7-ab97-69f651d93861.png)
+
+- Por ejemplo, en caso de no tener activa la interface de túnel VPN:
+
+![image](https://user-images.githubusercontent.com/94720207/210156537-eca2fbbb-58b6-4c41-8495-e60f3ab8be8a.png)
 
 ## Variables obtenidas
 
 - Esta herramienta funionca excelente como módilo adicional para generar las siguientes 5 variables automáticamente de manera sencilla
 
-![image](https://user-images.githubusercontent.com/94720207/210156178-f085f63f-5b41-46ba-85e4-05a5074a8343.png)
+![image](https://user-images.githubusercontent.com/94720207/210156689-584393f0-6566-4f39-93c6-a4cee788e461.png)
 
 
