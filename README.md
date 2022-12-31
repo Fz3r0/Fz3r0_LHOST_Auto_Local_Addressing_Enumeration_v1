@@ -42,4 +42,9 @@ python 00_Fz3r0_LHOST_Auto_Local_Addressing_Enumeration_v1.py
 
 ![image](https://user-images.githubusercontent.com/94720207/210156689-584393f0-6566-4f39-93c6-a4cee788e461.png)
 
+- Resultado:
+
+![image](https://user-images.githubusercontent.com/94720207/210156721-c4112de5-09b5-4793-b0cb-b0ddef15347e.png)
+
+
 
